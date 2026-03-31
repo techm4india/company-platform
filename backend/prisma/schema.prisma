@@ -1,0 +1,209 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String         @id @default(uuid())
+  email        String         @unique
+  passwordHash String
+  pinHash      String?
+
+  name         String
+  grade        String
+  track        Track
+  role         Role
+  xp           Int            @default(0)
+  level        Int            @default(1)
+  streak       Int            @default(0)
+  rank         Int            @default(0)
+  avatar       String
+  school       String
+  badges       String[]
+  completedTasks String[]
+
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+
+  refreshTokens RefreshToken[]
+  submissions   Submission[]
+  daySubmissions DaySubmission[]
+}
+
+enum Track {
+  Robotics
+  Coding
+  Drone
+  AI
+  Innovation
+}
+
+enum Role {
+  student
+  mentor
+  admin
+}
+
+model ClassSession {
+  id           String   @id @default(cuid())
+  day          Int
+  title        String
+  track        Track?
+  trackAll     Boolean  @default(false)
+  topic        String
+  time         String
+  mentor       String
+  status       ClassStatus
+  objectives   String[]
+  materials    String[]
+  recordingUrl String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([day])
+  @@index([status])
+}
+
+enum ClassStatus {
+  done
+  live
+  upcoming
+}
+
+model Submission {
+  id          String           @id @default(cuid())
+  studentId   String
+  student     User             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  track       Track
+  title       String
+  type        SubmissionType
+  submittedAt DateTime         @default(now())
+  status      SubmissionStatus @default(pending)
+  score       Int?
+  feedback    String?
+  fileType    String
+  xpAwarded   Int?
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([studentId, status])
+  @@index([status])
+  @@index([submittedAt])
+}
+
+enum SubmissionType {
+  code
+  assembly
+  project
+  quiz
+}
+
+enum SubmissionStatus {
+  pending
+  reviewed
+  approved
+  needs_revision
+}
+
+model Announcement {
+  id        String            @id @default(cuid())
+  type      AnnouncementType
+  title     String
+  body      String
+  dateLabel String
+  pinned    Boolean           @default(false)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+
+  @@index([pinned])
+  @@index([createdAt])
+}
+
+enum AnnouncementType {
+  urgent
+  info
+  event
+  achievement
+}
+
+model RefreshToken {
+  /// JWT `jti` (token id). Storing `jti` enables refresh rotation checks.
+  id        String   @id
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  expiresAt DateTime
+  revokedAt DateTime?
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Program {
+  id        String       @id @default(cuid())
+  name      String
+  year      Int
+  totalDays Int          @default(25)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  days      ProgramDay[]
+  state     ProgramState?
+  daySubmissions DaySubmission[]
+}
+
+model ProgramState {
+  programId          String   @id
+  program            Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  startDate          DateTime?
+  currentDayOverride Int?
+  timezone           String   @default("Asia/Kolkata")
+  updatedAt          DateTime @updatedAt
+}
+
+model ProgramDay {
+  id             String   @id @default(cuid())
+  programId      String
+  program        Program  @relation(fields: [programId], references: [id], onDelete: Cascade)
+  dayNumber      Int
+  topic          String
+  aiFocus        String
+  kitExperiment  String
+  dailyAssignment String
+  phase          Int
+  trackTags      String[]
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([programId, dayNumber])
+  @@index([dayNumber])
+}
+
+model DaySubmission {
+  id         String           @id @default(cuid())
+  programId  String
+  program    Program          @relation(fields: [programId], references: [id], onDelete: Cascade)
+  dayNumber  Int
+  userId     String
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  artifacts  Json
+  reflection String?
+  status     SubmissionStatus @default(pending)
+  score      Int?
+  feedback   String?
+  xpAwarded  Int?
+
+  submittedAt DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  @@unique([programId, dayNumber, userId])
+  @@index([programId, dayNumber])
+  @@index([userId])
+  @@index([status])
+}
+

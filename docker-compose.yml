@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: techm4schools
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d techm4schools"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3000
+      CORS_ORIGIN: http://localhost:5173
+      # If you set DATABASE_URL in your shell/.env file, compose will use it.
+      # Otherwise it falls back to the local docker Postgres service.
+      DATABASE_URL: ${DATABASE_URL:-postgresql://postgres:postgres@postgres:5432/techm4schools?schema=public}
+      REDIS_URL: redis://redis:6379
+      JWT_ACCESS_SECRET: change_me_access_change_me_access
+      JWT_REFRESH_SECRET: change_me_refresh_change_me_refresh
+      COOKIE_SECRET: change_me_cookie_change_me_cookie
+      ACCESS_TOKEN_TTL_SEC: 900
+      REFRESH_TOKEN_TTL_SEC: 2592000
+      RATE_LIMIT_MAX: 300
+      RATE_LIMIT_TIME_WINDOW_MS: 60000
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
+
