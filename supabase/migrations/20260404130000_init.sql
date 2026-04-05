@@ -830,14 +830,20 @@ do $$ begin
     using (user_id = auth.uid() or public.is_admin());
 exception when duplicate_object then null; end $$;
 
+drop policy if exists "certificates: admin insert" on public.certificates;
+drop policy if exists "certificates: admin update" on public.certificates;
+drop policy if exists "certificates: insert own or admin" on public.certificates;
+drop policy if exists "certificates: update own or admin" on public.certificates;
+
 do $$ begin
-  create policy "certificates: admin insert" on public.certificates for insert
-    with check (public.is_admin());
+  create policy "certificates: insert own or admin" on public.certificates for insert
+    with check (user_id = auth.uid() or public.is_admin());
 exception when duplicate_object then null; end $$;
 
 do $$ begin
-  create policy "certificates: admin update" on public.certificates for update
-    using (public.is_admin()) with check (public.is_admin());
+  create policy "certificates: update own or admin" on public.certificates for update
+    using (user_id = auth.uid() or public.is_admin())
+    with check (user_id = auth.uid() or public.is_admin());
 exception when duplicate_object then null; end $$;
 
 -- ─────────────────────────────────────────────────────────────────────────────
