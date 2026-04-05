@@ -6,6 +6,7 @@ import { UpdatesPage } from "./pages/UpdatesPage";
 import { LeaderboardPage } from "./pages/LeaderboardPage";
 import { ProfilePage } from "./pages/ProfilePage";
 import { CodeLabPage } from "./pages/CodeLabPage";
+import { useIsNarrow } from "./useIsNarrow";
 
 // ─── TYPES ────────────────────────────────────────────────────────────────────
 type Track = api.Track;
@@ -860,6 +861,8 @@ const Dashboard = ({ user, onNav }: { user: User; onNav: (t: TabId) => void }) =
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [tab, setTab] = useState<TabId>("dashboard");
+  const isNarrow = useIsNarrow();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   if (!user) return <LoginScreen onLogin={u => setUser(u)} />;
 
@@ -885,15 +888,48 @@ export default function App() {
   };
 
   return (
-    <div style={{ display:"flex", minHeight:"100vh", background:"#F8FAFC", fontFamily:"'DM Sans', 'Segoe UI', sans-serif" }}>
-      <div style={{ display:"block" }}>
-        <Sidebar user={user} active={tab} onChange={setTab} mobile={false} />
-      </div>
-      <main style={{ flex: 1, overflowY:"auto", padding:"28px 24px" }}>
-        <div style={{ maxWidth: 1100, margin:"0 auto" }}>
+    <div className="appShell" style={{ display:"flex", minHeight:"100vh", background:"#F8FAFC", fontFamily:"'DM Sans', 'Segoe UI', sans-serif" }}>
+      {!isNarrow && <Sidebar user={user} active={tab} onChange={setTab} mobile={false} />}
+
+      {isNarrow && (
+        <div className="mobileHeader">
+          <button className="iconBtn" onClick={() => setMobileMenuOpen(true)} aria-label="Open menu">☰</button>
+          <div style={{ fontFamily:"'DM Mono', monospace", fontWeight: 900, letterSpacing:"0.08em", fontSize: 12, color:"#0B1E3D" }}>
+            TECH<span style={{ color:"#10B981" }}>M4</span>SCHOOLS
+          </div>
+          <button className="iconBtn" onClick={() => setTab("profile")} aria-label="Profile">👤</button>
+        </div>
+      )}
+
+      {isNarrow && mobileMenuOpen && (
+        <div className="mobileOverlay" onClick={() => setMobileMenuOpen(false)} role="presentation">
+          <div className="mobileDrawer" onClick={(e) => e.stopPropagation()}>
+            <Sidebar user={user} active={tab} onChange={setTab} mobile={true} onClose={() => setMobileMenuOpen(false)} />
+          </div>
+        </div>
+      )}
+
+      <main className="main" style={{ flex: 1, overflowY:"auto", padding:"28px 24px" }}>
+        <div className="mainInner" style={{ maxWidth: 1100, margin:"0 auto" }}>
           {render()}
         </div>
       </main>
+
+      {isNarrow && (
+        <div className="mobileNav" role="navigation" aria-label="Bottom navigation">
+          {TABS.filter(t => t.roles.includes(user.role)).map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className="mobileNavBtn"
+              aria-current={tab === t.id ? "page" : undefined}
+            >
+              <div style={{ fontSize: 18, lineHeight: "18px" }}>{t.icon}</div>
+              <div style={{ fontSize: 10, fontWeight: 900, opacity: tab === t.id ? 1 : 0.7, whiteSpace:"nowrap" }}>{t.label}</div>
+            </button>
+          ))}
+        </div>
+      )}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Mono:wght@400;500;700&display=swap');
         * { box-sizing: border-box; }
@@ -902,6 +938,82 @@ export default function App() {
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #F1F5F9; }
         ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
+
+        .mobileHeader{
+          position: fixed;
+          top: 0; left: 0; right: 0;
+          height: 56px;
+          z-index: 50;
+          background: rgba(248,250,252,0.9);
+          backdrop-filter: blur(10px);
+          border-bottom: 1px solid #E2E8F0;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0 12px;
+        }
+        .iconBtn{
+          width: 40px;
+          height: 40px;
+          border-radius: 12px;
+          border: 1px solid #E2E8F0;
+          background: #fff;
+          cursor: pointer;
+          font-weight: 900;
+        }
+        .mobileOverlay{
+          position: fixed;
+          inset: 0;
+          z-index: 60;
+          background: rgba(15,23,42,0.4);
+          padding: 10px;
+          display: flex;
+          align-items: flex-start;
+          justify-content: center;
+        }
+        .mobileDrawer{
+          width: min(420px, 100%);
+          margin-top: 56px;
+          border-radius: 16px;
+          overflow: hidden;
+        }
+        .mobileNav{
+          position: fixed;
+          left: 0; right: 0; bottom: 0;
+          height: 64px;
+          z-index: 50;
+          background: rgba(255,255,255,0.9);
+          backdrop-filter: blur(10px);
+          border-top: 1px solid #E2E8F0;
+          display: flex;
+          gap: 6px;
+          padding: 8px 10px;
+          overflow-x: auto;
+        }
+        .mobileNavBtn{
+          min-width: 86px;
+          border: 1px solid transparent;
+          background: transparent;
+          border-radius: 14px;
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+          color: #0F172A;
+        }
+        .mobileNavBtn[aria-current="page"]{
+          background: #F0FDF4;
+          border-color: #6EE7B7;
+          color: #059669;
+        }
+
+        @media (max-width: 768px){
+          .main{
+            padding: 74px 12px 84px !important;
+          }
+        }
       `}</style>
     </div>
   );

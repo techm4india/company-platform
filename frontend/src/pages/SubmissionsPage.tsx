@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import * as api from "../api";
+import { useIsNarrow } from "../useIsNarrow";
 
 type SubmissionStatus = "pending" | "reviewed" | "approved" | "needs-revision";
 type SubmissionType = "code" | "assembly" | "project" | "quiz";
@@ -20,6 +21,7 @@ type Submission = {
 };
 
 export function SubmissionsPage({ user }: { user: api.User }) {
+  const isNarrow = useIsNarrow();
   const isStaff = user.role !== "student";
   const [subs, setSubs] = useState<Submission[]>([]);
   const [err, setErr] = useState<string>("");
@@ -88,7 +90,7 @@ export function SubmissionsPage({ user }: { user: api.User }) {
       {!isStaff && (
         <div style={{ background: "#fff", border: "1px solid #E2E8F0", borderRadius: 16, padding: 16, marginBottom: 16 }}>
           <div style={{ fontWeight: 900, marginBottom: 10 }}>New submission</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 180px 200px", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isNarrow ? "1fr" : "1fr 180px 200px", gap: 10 }}>
             <input value={newTitle} onChange={(e) => setNewTitle(e.target.value)} placeholder="Title" style={{ padding: 10, border: "1px solid #E2E8F0", borderRadius: 10 }} />
             <select value={newType} onChange={(e) => setNewType(e.target.value as SubmissionType)} style={{ padding: 10, border: "1px solid #E2E8F0", borderRadius: 10 }}>
               {["code", "assembly", "project", "quiz"].map((t) => (
@@ -143,7 +145,7 @@ export function SubmissionsPage({ user }: { user: api.User }) {
             </div>
 
             {isStaff && (
-              <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: "180px 120px 1fr 140px 140px", gap: 8 }}>
+              <div style={{ marginTop: 12, display: "grid", gridTemplateColumns: isNarrow ? "1fr" : "180px 120px 1fr 140px 140px", gap: 8 }}>
                 <select defaultValue={s.status} onChange={(e) => void review(s.id, e.target.value as SubmissionStatus)} style={{ padding: 8, border: "1px solid #E2E8F0", borderRadius: 10 }}>
                   {(["pending", "reviewed", "approved", "needs-revision"] as const).map((st) => (
                     <option key={st} value={st}>{st}</option>

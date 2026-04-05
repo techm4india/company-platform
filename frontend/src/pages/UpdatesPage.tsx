@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import * as api from "../api";
 import { UsersAdminPage } from "./UsersAdminPage";
+import { useIsNarrow } from "../useIsNarrow";
 
 type Announcement = {
   id: string;
@@ -12,6 +13,7 @@ type Announcement = {
 };
 
 export function UpdatesPage({ user }: { user: api.User }) {
+  const isNarrow = useIsNarrow();
   const isStaff = user.role !== "student";
   const [items, setItems] = useState<Announcement[]>([]);
   const [err, setErr] = useState("");
@@ -76,7 +78,7 @@ export function UpdatesPage({ user }: { user: api.User }) {
       {isStaff && (
         <div style={{ background: "#fff", border: "1px solid #E2E8F0", borderRadius: 16, padding: 16, marginBottom: 16 }}>
           <div style={{ fontWeight: 900, marginBottom: 10 }}>New announcement</div>
-          <div style={{ display: "grid", gridTemplateColumns: "140px 1fr", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isNarrow ? "1fr" : "140px 1fr", gap: 10 }}>
             <select value={draft.type} onChange={(e) => setDraft((d) => ({ ...d, type: e.target.value as any }))} style={{ padding: 10, border: "1px solid #E2E8F0", borderRadius: 10 }}>
               {(["urgent", "info", "event", "achievement"] as const).map((t) => <option key={t} value={t}>{t}</option>)}
             </select>

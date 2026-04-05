@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import * as api from "../api";
+import { useIsNarrow } from "../useIsNarrow";
 
 export function UsersAdminPage({ user }: { user: api.User }) {
+  const isNarrow = useIsNarrow();
   const [err, setErr] = useState("");
   const [users, setUsers] = useState<any[]>([]);
 
@@ -72,7 +74,7 @@ export function UsersAdminPage({ user }: { user: api.User }) {
 
       <div style={{ background: "#fff", border: "1px solid #E2E8F0", borderRadius: 16, padding: 16, marginBottom: 16 }}>
         <div style={{ fontWeight: 900, marginBottom: 10 }}>Create user</div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 140px 160px", gap: 10 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isNarrow ? "1fr" : "1fr 1fr 140px 160px", gap: 10 }}>
           <input value={draft.email} onChange={(e) => setDraft((d) => ({ ...d, email: e.target.value }))} placeholder="Email" style={{ padding: 10, border: "1px solid #E2E8F0", borderRadius: 10 }} />
           <input value={draft.password} onChange={(e) => setDraft((d) => ({ ...d, password: e.target.value }))} placeholder="Temp password" style={{ padding: 10, border: "1px solid #E2E8F0", borderRadius: 10 }} />
           <select value={draft.role} onChange={(e) => setDraft((d) => ({ ...d, role: e.target.value as api.Role }))} style={{ padding: 10, border: "1px solid #E2E8F0", borderRadius: 10 }}>
@@ -81,7 +83,7 @@ export function UsersAdminPage({ user }: { user: api.User }) {
           <select value={draft.track} onChange={(e) => setDraft((d) => ({ ...d, track: e.target.value as api.Track }))} style={{ padding: 10, border: "1px solid #E2E8F0", borderRadius: 10 }}>
             {(["Robotics", "Coding", "Drone", "AI", "Innovation"] as const).map((t) => <option key={t} value={t}>{t}</option>)}
           </select>
-          <input value={draft.name} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} placeholder="Name" style={{ gridColumn: "1 / 3", padding: 10, border: "1px solid #E2E8F0", borderRadius: 10 }} />
+          <input value={draft.name} onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))} placeholder="Name" style={{ gridColumn: isNarrow ? "auto" : "1 / 3", padding: 10, border: "1px solid #E2E8F0", borderRadius: 10 }} />
           <input value={draft.grade} onChange={(e) => setDraft((d) => ({ ...d, grade: e.target.value }))} placeholder="Grade" style={{ padding: 10, border: "1px solid #E2E8F0", borderRadius: 10 }} />
           <input value={draft.school} onChange={(e) => setDraft((d) => ({ ...d, school: e.target.value }))} placeholder="School" style={{ padding: 10, border: "1px solid #E2E8F0", borderRadius: 10 }} />
           <input value={draft.avatar} onChange={(e) => setDraft((d) => ({ ...d, avatar: e.target.value }))} placeholder="Avatar (optional)" style={{ padding: 10, border: "1px solid #E2E8F0", borderRadius: 10 }} />
@@ -96,17 +98,21 @@ export function UsersAdminPage({ user }: { user: api.User }) {
 
       <div style={{ background: "#fff", border: "1px solid #E2E8F0", borderRadius: 16, overflow: "hidden" }}>
         <div style={{ padding: "10px 14px", background: "#F8FAFC", borderBottom: "1px solid #E2E8F0", fontWeight: 900 }}>All users</div>
-        <div style={{ display: "grid", gridTemplateColumns: "220px 1fr 120px 120px", padding: "10px 14px", borderBottom: "1px solid #E2E8F0", color: "#64748B", fontSize: 12, fontWeight: 800 }}>
-          <div>Email</div><div>Name</div><div>Role</div><div>Track</div>
-        </div>
-        {users.map((u) => (
-          <div key={u.id} style={{ display: "grid", gridTemplateColumns: "220px 1fr 120px 120px", padding: "10px 14px", borderBottom: "1px solid #F1F5F9" }}>
-            <div style={{ fontFamily: "monospace", fontSize: 12 }}>{u.email}</div>
-            <div>{u.name}</div>
-            <div style={{ fontWeight: 900 }}>{u.role}</div>
-            <div>{u.track}</div>
+        <div style={{ overflowX: isNarrow ? "auto" : "visible" }}>
+          <div style={{ minWidth: isNarrow ? 560 : "auto" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "220px 1fr 120px 120px", padding: "10px 14px", borderBottom: "1px solid #E2E8F0", color: "#64748B", fontSize: 12, fontWeight: 800 }}>
+              <div>Email</div><div>Name</div><div>Role</div><div>Track</div>
+            </div>
+            {users.map((u) => (
+              <div key={u.id} style={{ display: "grid", gridTemplateColumns: "220px 1fr 120px 120px", padding: "10px 14px", borderBottom: "1px solid #F1F5F9" }}>
+                <div style={{ fontFamily: "monospace", fontSize: 12 }}>{u.email}</div>
+                <div style={{ whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{u.name}</div>
+                <div style={{ fontWeight: 900 }}>{u.role}</div>
+                <div>{u.track}</div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     </div>
   );

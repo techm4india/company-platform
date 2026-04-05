@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import * as api from "../api";
+import { useIsNarrow } from "../useIsNarrow";
 
 export function ProfilePage({ user, onLogout }: { user: api.User; onLogout: () => void }) {
+  const isNarrow = useIsNarrow();
   const [prog, setProg] = useState<{ currentDay: number; totalDays: number } | null>(null);
   const [today, setToday] = useState<any | null>(null);
 
@@ -53,7 +55,7 @@ export function ProfilePage({ user, onLogout }: { user: api.User; onLogout: () =
         </button>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "320px 1fr", gap: 16, alignItems: "start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: isNarrow ? "1fr" : "320px 1fr", gap: 16, alignItems: "start" }}>
         <div style={{ background: "#fff", border: "1px solid #E2E8F0", borderRadius: 16, padding: 16 }}>
           <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
             <div
@@ -82,7 +84,7 @@ export function ProfilePage({ user, onLogout }: { user: api.User; onLogout: () =
             </div>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 14 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isNarrow ? "1fr" : "1fr 1fr", gap: 10, marginTop: 14 }}>
             {[
               { label: "XP", value: user.xp.toLocaleString(), color: "#F59E0B" },
               { label: "Level", value: String(user.level), color: "#10B981" },

@@ -1,5 +1,6 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as api from "../api";
+import { useIsNarrow } from "../useIsNarrow";
 
 type LangId = "html" | "js" | "python";
 
@@ -42,6 +43,7 @@ print(2 + 3)`
 };
 
 export function CodeLabPage({ user }: { user: api.User }) {
+  const isNarrow = useIsNarrow();
   const [lang, setLang] = useState<LangId>("html");
   const [code, setCode] = useState(TEMPLATES.html.starter);
   const [output, setOutput] = useState("");
@@ -56,13 +58,19 @@ export function CodeLabPage({ user }: { user: api.User }) {
     setOutput("");
   }
 
+  useEffect(() => {
+    if (lang !== "html") return;
+    if (!iframeRef.current) return;
+    iframeRef.current.srcdoc = code;
+  }, [lang, code]);
+
   function run() {
     setRunning(true);
     setOutput("");
     setTimeout(() => {
       setRunning(false);
       if (lang === "html") {
-        iframeRef.current!.srcdoc = code;
+        if (iframeRef.current) iframeRef.current.srcdoc = code;
         return;
       }
       // Lightweight simulated runner (no server execution)
@@ -121,8 +129,8 @@ export function CodeLabPage({ user }: { user: api.User }) {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr" }}>
-          <div style={{ padding: 12, borderRight: "1px solid #E2E8F0" }}>
+        <div style={{ display: "grid", gridTemplateColumns: isNarrow ? "1fr" : "1fr 1fr" }}>
+          <div style={{ padding: 12, borderRight: isNarrow ? "none" : "1px solid #E2E8F0", borderBottom: isNarrow ? "1px solid #E2E8F0" : "none" }}>
             <textarea
               value={code}
               onChange={(e) => setCode(e.target.value)}
@@ -130,6 +138,9 @@ export function CodeLabPage({ user }: { user: api.User }) {
             />
           </div>
           <div style={{ padding: 12, background: "#F8FAFC" }}>
+            <div style={{ fontSize: 12, color: "#64748B", marginBottom: 8 }}>
+              {lang === "html" ? "Preview updates automatically (RUN also works)." : "JS/Python output is simulated (safe — no server execution)."}
+            </div>
             {lang === "html" ? (
               <iframe ref={iframeRef} title="preview" sandbox="allow-scripts" style={{ width: "100%", height: 420, border: "1px solid #E2E8F0", borderRadius: 12, background: "#fff" }} />
             ) : (

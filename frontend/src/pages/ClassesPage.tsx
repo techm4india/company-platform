@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import * as api from "../api";
+import { useIsNarrow } from "../useIsNarrow";
 
 type Track = api.Track | "All";
 type ClassStatus = "done" | "live" | "upcoming";
@@ -19,6 +20,7 @@ type ClassSession = {
 };
 
 export function ClassesPage({ user }: { user: api.User }) {
+  const isNarrow = useIsNarrow();
   const isStaff = user.role !== "student";
   const [classes, setClasses] = useState<ClassSession[]>([]);
   const [err, setErr] = useState<string>("");
@@ -103,7 +105,7 @@ export function ClassesPage({ user }: { user: api.User }) {
       {isStaff && (
         <div style={{ background: "#fff", border: "1px solid #E2E8F0", borderRadius: 16, padding: 16, marginBottom: 16 }}>
           <div style={{ fontWeight: 800, marginBottom: 12 }}>Create class</div>
-          <div style={{ display: "grid", gridTemplateColumns: "120px 1fr 1fr", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isNarrow ? "1fr" : "120px 1fr 1fr", gap: 10 }}>
             <input value={draft.day} onChange={(e) => setDraft((d) => ({ ...d, day: Number(e.target.value) }))} type="number" min={1} style={{ padding: 10, border: "1px solid #E2E8F0", borderRadius: 10 }} />
             <input value={draft.title} onChange={(e) => setDraft((d) => ({ ...d, title: e.target.value }))} placeholder="Title" style={{ padding: 10, border: "1px solid #E2E8F0", borderRadius: 10 }} />
             <select value={draft.track} onChange={(e) => setDraft((d) => ({ ...d, track: e.target.value as Track }))} style={{ padding: 10, border: "1px solid #E2E8F0", borderRadius: 10 }}>
