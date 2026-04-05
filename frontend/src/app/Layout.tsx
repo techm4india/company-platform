@@ -7,33 +7,33 @@ import { useIsNarrow } from "../useIsNarrow";
 import { useState } from "react";
 
 const studentNav = [
-  { to: "/", label: "Dashboard", icon: "🏠" },
-  { to: "/live", label: "Live Class", icon: "🎥" },
-  { to: "/program", label: "Program", icon: "🗓️" },
-  { to: "/assignments", label: "Assignments", icon: "📤" },
-  { to: "/quizzes", label: "Quizzes", icon: "📝" },
-  { to: "/hackathon", label: "Hackathon", icon: "🏁" },
-  { to: "/kits", label: "Kit", icon: "📦" },
-  { to: "/payments", label: "Payments", icon: "💳" },
-  { to: "/notifications", label: "Notifications", icon: "🔔" },
-  { to: "/leaderboard", label: "Leaderboard", icon: "🏆" },
-  { to: "/assistant", label: "AI Assistant", icon: "🤖" },
-  { to: "/support", label: "Support", icon: "🛟" },
-  { to: "/profile", label: "Profile", icon: "👤" }
+  { to: "/app", label: "Dashboard", icon: "🏠" },
+  { to: "/app/live", label: "Live Class", icon: "🎥" },
+  { to: "/app/program", label: "Program", icon: "🗓️" },
+  { to: "/app/assignments", label: "Assignments", icon: "📤" },
+  { to: "/app/quizzes", label: "Quizzes", icon: "📝" },
+  { to: "/app/hackathon", label: "Hackathon", icon: "🏁" },
+  { to: "/app/kits", label: "Kit", icon: "📦" },
+  { to: "/app/payments", label: "Payments", icon: "💳" },
+  { to: "/app/notifications", label: "Notifications", icon: "🔔" },
+  { to: "/app/leaderboard", label: "Leaderboard", icon: "🏆" },
+  { to: "/app/assistant", label: "AI Assistant", icon: "🤖" },
+  { to: "/app/support", label: "Support", icon: "🛟" },
+  { to: "/app/profile", label: "Profile", icon: "👤" }
 ];
 
 const adminNav = [
-  { to: "/admin", label: "Admin Home", icon: "🛡️" },
-  { to: "/admin/students", label: "Students", icon: "👥" },
-  { to: "/admin/payments", label: "Payments", icon: "✅" },
-  { to: "/admin/content", label: "Content", icon: "📚" },
-  { to: "/admin/assignments", label: "Assignments", icon: "📌" },
-  { to: "/admin/submissions", label: "Submissions", icon: "📨" },
-  { to: "/admin/hackathon", label: "Hackathon", icon: "🏁" },
-  { to: "/admin/kits", label: "Kits", icon: "📦" },
-  { to: "/admin/notifications", label: "Broadcast", icon: "📣" },
-  { to: "/admin/performance", label: "Performance", icon: "🧠" },
-  { to: "/admin/analytics", label: "Analytics", icon: "📈" }
+  { to: "/app/admin", label: "Admin Home", icon: "🛡️" },
+  { to: "/app/admin/students", label: "Students", icon: "👥" },
+  { to: "/app/admin/payments", label: "Payments", icon: "✅" },
+  { to: "/app/admin/content", label: "Content", icon: "📚" },
+  { to: "/app/admin/assignments", label: "Assignments", icon: "📌" },
+  { to: "/app/admin/submissions", label: "Submissions", icon: "📨" },
+  { to: "/app/admin/hackathon", label: "Hackathon", icon: "🏁" },
+  { to: "/app/admin/kits", label: "Kits", icon: "📦" },
+  { to: "/app/admin/notifications", label: "Broadcast", icon: "📣" },
+  { to: "/app/admin/performance", label: "Performance", icon: "🧠" },
+  { to: "/app/admin/analytics", label: "Analytics", icon: "📈" }
 ];
 
 function SideNav({ profile, onNavigate }: { profile: Profile; onNavigate?: () => void }) {

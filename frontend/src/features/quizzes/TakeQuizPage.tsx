@@ -113,7 +113,7 @@ export function TakeQuizPage() {
           <div className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-extrabold text-slate-700">
             ⏱ {mm}:{ss}
           </div>
-          <Button variant="secondary" onClick={() => nav("/quizzes")}>Back</Button>
+          <Button variant="secondary" onClick={() => nav("/app/quizzes")}>Back</Button>
         </div>
       </div>
 

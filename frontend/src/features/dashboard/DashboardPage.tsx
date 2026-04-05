@@ -85,7 +85,7 @@ export function DashboardPage() {
               <div className="text-sm font-extrabold text-slate-900">Today’s class</div>
               <div className="mt-1 text-sm text-slate-500">{live ? live.title : "No live class right now."}</div>
             </div>
-            <Button onClick={() => nav("/live")}>Join / View</Button>
+            <Button onClick={() => nav("/app/live")}>Join / View</Button>
           </div>
         </Card>
 
@@ -103,7 +103,7 @@ export function DashboardPage() {
         <Card>
           <div className="flex items-center justify-between gap-3">
             <div className="text-sm font-extrabold text-slate-900">Upcoming sessions</div>
-            <Button variant="secondary" onClick={() => nav("/live")}>Schedule</Button>
+            <Button variant="secondary" onClick={() => nav("/app/live")}>Schedule</Button>
           </div>
           <div className="mt-3 space-y-2">
             {upcoming.map((s) => (
@@ -122,7 +122,7 @@ export function DashboardPage() {
         <Card>
           <div className="flex items-center justify-between gap-3">
             <div className="text-sm font-extrabold text-slate-900">Notifications</div>
-            <Button variant="secondary" onClick={() => nav("/notifications")}>Open ({unread})</Button>
+            <Button variant="secondary" onClick={() => nav("/app/notifications")}>Open ({unread})</Button>
           </div>
           <div className="mt-3 space-y-2">
             {notifs.map((n) => (

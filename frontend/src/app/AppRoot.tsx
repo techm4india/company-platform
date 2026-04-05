@@ -7,6 +7,8 @@ import { ResetPasswordPage } from "./ResetPasswordPage";
 import { Layout } from "./Layout";
 import { RequireAuth, RequireRole } from "./Require";
 import { useProfile } from "./useProfile";
+import { PublicHomePage } from "./PublicHomePage";
+import { DemoAppPage } from "./DemoAppPage";
 import { DashboardPage } from "../features/dashboard/DashboardPage";
 import { LiveClassPage } from "../features/live/LiveClassPage";
 import { ProgramPage } from "../features/program/ProgramPage";
@@ -49,8 +51,12 @@ export default function AppRoot() {
   useEffect(() => {
     let alive = true;
     void (async () => {
-      const { data } = await supabase.auth.getSession();
-      if (alive) setSession(data.session ?? null);
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (alive) setSession(data.session ?? null);
+      } catch {
+        if (alive) setSession(null);
+      }
     })();
     const { data: sub } = supabase.auth.onAuthStateChange((_evt, s) => setSession(s));
     return () => {
@@ -62,6 +68,8 @@ export default function AppRoot() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<PublicHomePage />} />
+        <Route path="/demo" element={<DemoAppPage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/reset-password" element={<ResetPasswordPage />} />
 
@@ -73,7 +81,7 @@ export default function AppRoot() {
           }
         >
           <Route
-            path="/"
+            path="/app"
             element={
               <div className="space-y-3">
                 {profileLoading && <div className="text-sm text-slate-500">Loading profile…</div>}
@@ -83,22 +91,22 @@ export default function AppRoot() {
             }
           />
 
-          <Route path="/live" element={<LiveClassPage />} />
-          <Route path="/program" element={<ProgramPage />} />
-          <Route path="/assignments" element={<AssignmentsPage />} />
-          <Route path="/quizzes" element={<QuizzesPage />} />
-          <Route path="/quizzes/:id" element={<TakeQuizPage />} />
-          <Route path="/hackathon" element={<HackathonPage />} />
-          <Route path="/kits" element={<KitsPage />} />
-          <Route path="/payments" element={<PaymentsPage />} />
-          <Route path="/notifications" element={<NotificationsPage />} />
-          <Route path="/leaderboard" element={<LeaderboardPage />} />
-          <Route path="/assistant" element={<AIAssistantPage />} />
-          <Route path="/support" element={<SupportPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/app/live" element={<LiveClassPage />} />
+          <Route path="/app/program" element={<ProgramPage />} />
+          <Route path="/app/assignments" element={<AssignmentsPage />} />
+          <Route path="/app/quizzes" element={<QuizzesPage />} />
+          <Route path="/app/quizzes/:id" element={<TakeQuizPage />} />
+          <Route path="/app/hackathon" element={<HackathonPage />} />
+          <Route path="/app/kits" element={<KitsPage />} />
+          <Route path="/app/payments" element={<PaymentsPage />} />
+          <Route path="/app/notifications" element={<NotificationsPage />} />
+          <Route path="/app/leaderboard" element={<LeaderboardPage />} />
+          <Route path="/app/assistant" element={<AIAssistantPage />} />
+          <Route path="/app/support" element={<SupportPage />} />
+          <Route path="/app/profile" element={<ProfilePage />} />
 
           <Route
-            path="/admin"
+            path="/app/admin"
             element={
               <RequireRole profile={profile} role="admin">
                 <AdminHomePage />
@@ -106,7 +114,7 @@ export default function AppRoot() {
             }
           />
           <Route
-            path="/admin/students"
+            path="/app/admin/students"
             element={
               <RequireRole profile={profile} role="admin">
                 <StudentsAdminPage />
@@ -114,7 +122,7 @@ export default function AppRoot() {
             }
           />
           <Route
-            path="/admin/payments"
+            path="/app/admin/payments"
             element={
               <RequireRole profile={profile} role="admin">
                 <PaymentsAdminPage />
@@ -122,7 +130,7 @@ export default function AppRoot() {
             }
           />
           <Route
-            path="/admin/content"
+            path="/app/admin/content"
             element={
               <RequireRole profile={profile} role="admin">
                 <ContentAdminPage />
@@ -130,7 +138,7 @@ export default function AppRoot() {
             }
           />
           <Route
-            path="/admin/assignments"
+            path="/app/admin/assignments"
             element={
               <RequireRole profile={profile} role="admin">
                 <AssignmentsAdminPage />
@@ -138,7 +146,7 @@ export default function AppRoot() {
             }
           />
           <Route
-            path="/admin/submissions"
+            path="/app/admin/submissions"
             element={
               <RequireRole profile={profile} role="admin">
                 <SubmissionsAdminPage />
@@ -146,7 +154,7 @@ export default function AppRoot() {
             }
           />
           <Route
-            path="/admin/hackathon"
+            path="/app/admin/hackathon"
             element={
               <RequireRole profile={profile} role="admin">
                 <HackathonAdminPage />
@@ -154,7 +162,7 @@ export default function AppRoot() {
             }
           />
           <Route
-            path="/admin/kits"
+            path="/app/admin/kits"
             element={
               <RequireRole profile={profile} role="admin">
                 <KitsAdminPage />
@@ -162,7 +170,7 @@ export default function AppRoot() {
             }
           />
           <Route
-            path="/admin/notifications"
+            path="/app/admin/notifications"
             element={
               <RequireRole profile={profile} role="admin">
                 <BroadcastAdminPage />
@@ -170,7 +178,7 @@ export default function AppRoot() {
             }
           />
           <Route
-            path="/admin/analytics"
+            path="/app/admin/analytics"
             element={
               <RequireRole profile={profile} role="admin">
                 <AnalyticsPage />
@@ -178,7 +186,7 @@ export default function AppRoot() {
             }
           />
           <Route
-            path="/admin/performance"
+            path="/app/admin/performance"
             element={
               <RequireRole profile={profile} role="admin">
                 <PerformanceAdminPage />
@@ -187,7 +195,7 @@ export default function AppRoot() {
           />
         </Route>
 
-        <Route path="*" element={<AuthPage />} />
+        <Route path="*" element={<PublicHomePage />} />
       </Routes>
     </BrowserRouter>
   );
